@@ -24,7 +24,7 @@
         </member>
         <member name="M:UberAPI.Controllers.DriverController.AcceptOrDeclineReservation(UberAPI.Models.Reservation,UberAPI.Helpers.Enums.ReservationDecisionEnum)">
             <summary>
-            Get all pending reservations for loged in Driver
+            Accept or Decline reservation
             </summary>
             <returns></returns>
         </member>

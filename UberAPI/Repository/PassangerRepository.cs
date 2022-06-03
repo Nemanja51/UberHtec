@@ -59,6 +59,19 @@ namespace UberAPI.Repository
             //    throw new Exception() { Message = "Driver is not available!" };
             //}
         }
+        public bool IsThereReservationRequestPending(int passangerId)
+        {
+            var reservations = _db.Reservations.Where(r => r.PassangerId == passangerId && r.ReservationStatus == ReservationStatusEnum.Pending);
+
+            if (reservations.Any())
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
         public ReservationStatusEnum SendReservationRequest(int passangerId)
         {
             var reservationStatus = _db.Reservations.Where(s=>s.PassangerId == passangerId).Select(r=>r.ReservationStatus).FirstOrDefault();

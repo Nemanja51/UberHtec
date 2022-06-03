@@ -41,9 +41,19 @@ namespace UberAPI.Controllers
         [HttpPost("reservevehicle")]
         public IActionResult SendReservationRequest(Reservation reservation)
         {
+            var passangerId = Convert.ToInt32(User.Identity.Name);
+
+            //if there is already reservation request for pasanger on pending
+            //passanger can not make another request
+            if (_passangerRepo.IsThereReservationRequestPending(passangerId))
+            {
+                //there is pending request
+                return Ok(new { message = "You have alreay pending request, please be patient!" });
+            }
+
             try
             {
-                reservation.PassangerId = Convert.ToInt32(User.Identity.Name);
+                reservation.PassangerId = passangerId;
                 reservation.ReservationStatus = Helpers.Enums.ReservationStatusEnum.Pending;
 
                 _passangerRepo.SendReservationRequest(reservation);
