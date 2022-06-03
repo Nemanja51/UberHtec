@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>UberAPI</name>
+    </assembly>
+    <members>
+        <member name="M:UberAPI.Controllers.DriverController.GetAllDrivers">
+            <summary>
+            We are loading 1000 drivers here 
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:UberAPI.Controllers.DriverController.DriversWorkingState(UberAPI.Models.Driver.DriversAvailability)">
+            <summary>
+            This method is used to change drivers availability 
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:UberAPI.Controllers.DriverController.GetAllPendingReservations">
+            <summary>
+            Get all pending reservations for loged in Driver
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:UberAPI.Controllers.DriverController.AcceptOrDeclineReservation(UberAPI.Models.Reservation,UberAPI.Helpers.Enums.ReservationDecisionEnum)">
+            <summary>
+            Get all pending reservations for loged in Driver
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:UberAPI.Controllers.PassangerController.GetClosestDrivers(UberAPI.Helpers.Cordinates)">
+            <summary>
+            Not developed 
+            Returns a list of twenty idle vehicles in his proximity
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:UberAPI.Controllers.PassangerController.SendReservationRequest(UberAPI.Models.Reservation)">
+            <summary>
+            Reserve vehicle
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:UberAPI.Controllers.UsersController.Authenticate(UberAPI.Models.User)">
+            <summary>
+            Authenticate/log in user
+            </summary>
+            <param name="userModel"></param>
+            <returns></returns>
+        </member>
+        <member name="M:UberAPI.Controllers.UsersController.Register(UberAPI.Models.User)">
+            <summary>
+            Registrating new user
+            </summary>
+            <param name="userModel"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
