@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UberAPI.Data;
 
 namespace UberAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220606063752_addingReservationTimes")]
+    partial class addingReservationTimes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -75,18 +77,6 @@ namespace UberAPI.Migrations
                     b.Property<int>("PassangerId")
                         .HasColumnType("int");
 
-                    b.Property<double>("PassangersCurrentLocationLatitude")
-                        .HasColumnType("float");
-
-                    b.Property<double>("PassangersCurrentLocationLongitude")
-                        .HasColumnType("float");
-
-                    b.Property<double>("PassangersDesiredLocationLatitude")
-                        .HasColumnType("float");
-
-                    b.Property<double>("PassangersDesiredLocationLongitude")
-                        .HasColumnType("float");
-
                     b.Property<int>("ReservationStatus")
                         .HasColumnType("int");
 
@@ -103,29 +93,6 @@ namespace UberAPI.Migrations
                     b.HasIndex("PassangerId");
 
                     b.ToTable("Reservations");
-                });
-
-            modelBuilder.Entity("UberAPI.Models.ReservationTime", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime?>("EndTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ReservationId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReservationId");
-
-                    b.ToTable("ReservationTimes");
                 });
 
             modelBuilder.Entity("UberAPI.Models.User", b =>
@@ -198,15 +165,6 @@ namespace UberAPI.Migrations
                     b.HasOne("UberAPI.Models.User", "Passanger")
                         .WithMany()
                         .HasForeignKey("PassangerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("UberAPI.Models.ReservationTime", b =>
-                {
-                    b.HasOne("UberAPI.Models.Reservation", "Reservation")
-                        .WithMany()
-                        .HasForeignKey("ReservationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

@@ -72,10 +72,30 @@ namespace UberAPI.Repository
                 return false;
             }
         }
-        public ReservationStatusEnum SendReservationRequest(int passangerId)
+        public ReservationStatusCheck CheckRequestStatus(int passangerId)
         {
-            var reservationStatus = _db.Reservations.Where(s=>s.PassangerId == passangerId).Select(r=>r.ReservationStatus).FirstOrDefault();
-            return reservationStatus;
+            Reservation reservation = _db.Reservations.Where(s => s.PassangerId == passangerId).FirstOrDefault();
+            TimeSpan timePassed = DateTime.Now - reservation.ReservationTime;
+            ReservationStatusCheck resCheck = new ReservationStatusCheck();
+
+            if (reservation.ReservationStatus != ReservationStatusEnum.Reserved) 
+            {
+                //if request is old more then 2 mins it means it is authomaticli declined
+                //this logic should be in some timer that is checking and calculatin every few seconds, but for now it is ok like this
+                if (timePassed.TotalSeconds > 120)
+                {
+                    reservation.StatusChangeTime = DateTime.Now;
+                    reservation.ReservationStatus = ReservationStatusEnum.Declined;
+
+                    _db.Reservations.Update(reservation);
+                    _db.SaveChanges();
+                }
+            }
+
+            resCheck.ReservationStatus = reservation.ReservationStatus;
+            resCheck.ReservationTimePassed = timePassed;
+
+            return resCheck;
         }
     }
 }

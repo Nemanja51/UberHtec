@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using UberAPI.Helpers;
+using UberAPI.Helpers.Enums;
 using UberAPI.Models;
 using UberAPI.Repository.IRepository;
+using UberAPI.Helpers.Constants;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -22,7 +24,6 @@ namespace UberAPI.Controllers
         }
 
         /// <summary>
-        /// Not developed 
         /// Returns a list of twenty idle vehicles in his proximity
         /// </summary>
         /// <returns></returns>
@@ -48,22 +49,45 @@ namespace UberAPI.Controllers
             if (_passangerRepo.IsThereReservationRequestPending(passangerId))
             {
                 //there is pending request
-                return Ok(new { message = "You have alreay pending request, please be patient!" });
+                return Ok(new { message = InfoConstants.PendingReservationBePatient });
             }
 
             try
             {
                 reservation.PassangerId = passangerId;
-                reservation.ReservationStatus = Helpers.Enums.ReservationStatusEnum.Pending;
+                reservation.ReservationStatus = ReservationStatusEnum.Pending;
+                reservation.ReservationTime = DateTime.Now;
 
                 _passangerRepo.SendReservationRequest(reservation);
-                return Ok(new { message = "Reserved!"});
+                return Ok(new { message = InfoConstants.Reserved });
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
+
+        /// <summary>
+        /// Checking reservation request status and time from sending reservation request
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("checkreservationstatus")]
+        public IActionResult CheckReservationRequest() 
+        {
+            var passangerId = Convert.ToInt32(User.Identity.Name);
+            ReservationStatusCheck check = _passangerRepo.CheckRequestStatus(passangerId);
+
+            if (check.ReservationStatus == ReservationStatusEnum.Reserved)
+            {
+                return Ok(new { message = InfoConstants.AcceptedReservation });
+            }
+            else if (check.ReservationStatus == ReservationStatusEnum.Declined)
+            {
+                return Ok(new { message = InfoConstants.DeclinedReservation });
+            }
+            return Ok(new { message = InfoConstants.PendingReservation });
+        }
+
 
     }
 }

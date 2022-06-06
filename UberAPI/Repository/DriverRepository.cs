@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using System;
 using UberAPI.Models.Driver;
 using UberAPI.Helpers.Enums;
+using UberAPI.Helpers;
 
 namespace UberAPI.Repository
 {
@@ -74,8 +75,53 @@ namespace UberAPI.Repository
                     break;
             }
 
+            reservation.StatusChangeTime = DateTime.Now;
+
             _db.Reservations.Update(reservation);
             _db.SaveChanges();
+        }
+        public void DeclineAllPendingRequests(int driversId, int reservationId)
+        {
+            //find all pending reservations for driver exept the one that is accepted
+            var reservations = _db.Reservations.Where(d=>d.DriverId == driversId 
+            && d.ReservationStatus == ReservationStatusEnum.Pending && d.Id != reservationId);
+
+            foreach (var reservation in reservations) 
+            {
+                reservation.ReservationStatus = ReservationStatusEnum.Declined;
+            };
+
+            _db.Reservations.UpdateRange(reservations);
+            _db.SaveChanges();
+
+        }
+        public void SetLocation(int driversId, Cordinates newLocation)
+        {
+            var driversLocation = _db.DriversLocations.Where(d=>d.DriversId == driversId).FirstOrDefault();
+            driversLocation.Latitude = newLocation.Latitude;
+            driversLocation.Longitude = newLocation.Longitude;
+
+            _db.DriversLocations.Update(driversLocation);
+            _db.SaveChanges();
+        }
+        public StartEndEnum StartEndDrive(int reservationId)
+        {
+            //check should it be start or end
+            var reservationTime = _db.ReservationTimes.Where(rt=>rt.ReservationId == reservationId).FirstOrDefault();
+            if (reservationTime != null)
+            {
+                //end
+                reservationTime.EndTime = DateTime.Now;
+                return StartEndEnum.End;
+            }
+            else
+            {
+                //start
+                reservationTime.Id = reservationId;
+                reservationTime.StartTime = DateTime.Now;
+                return StartEndEnum.Start;
+            }
+
         }
     }
 }

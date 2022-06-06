@@ -15,5 +15,6 @@ namespace UberAPI.Data
         public DbSet<DriversLocation> DriversLocations { get; set; }
         public DbSet<DriversAvailability> DriversAvailability { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
+        public DbSet<ReservationTime> ReservationTimes { get; set; }
     }
 }

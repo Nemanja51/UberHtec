@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UberAPI.Helpers;
 using UberAPI.Helpers.Constants;
 using UberAPI.Helpers.Enums;
 using UberAPI.Models;
@@ -74,14 +75,59 @@ namespace UberAPI.Controllers
         [HttpPost("acceptordeclinereservation")]
         public IActionResult AcceptOrDeclineReservation([FromBody] Reservation reservationModel, ReservationDecisionEnum decision)
         {
-            //var logedInUserId = Convert.ToInt32(User.Identity.Name);
-            //var reservations = _driversRepo.GetAllPendingReservations(logedInUserId);
-
             _driversRepo.AcceptOrDeclineReservation(reservationModel.Id, decision);
 
-            return Ok(reservationModel);
+            if (decision == ReservationDecisionEnum.Accept) 
+            {
+                //if driver accepts one then all others that are pending are going to be declined
+                _driversRepo.DeclineAllPendingRequests(Convert.ToInt32(User.Identity.Name), reservationModel.Id);
+                return Ok(new { message = InfoConstants.YouHaveAcceptedReservation });
+            }
+            else if (decision == ReservationDecisionEnum.Decline)
+            {
+                return Ok(new { message = InfoConstants.YouHaveDeclinedReservation });
+            }
+
+            return Ok();
         }
 
+        /// <summary>
+        /// Set drivers location manualy
+        /// </summary>
+        /// <param name="cordinates"></param>
+        /// <returns></returns>
+        [HttpPost("setdriverslocation")]
+        public IActionResult SetLocation(Cordinates cordinates) 
+        {
+            _driversRepo.SetLocation(Convert.ToInt32(User.Identity.Name), cordinates);
+            return Ok();
+        }
+
+        /// <summary>
+        /// Start / End drive
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("startenddrive")]
+        public IActionResult StartEndDrive(int reservationId) 
+        {
+            try
+            {
+                StartEndEnum response = _driversRepo.StartEndDrive(reservationId);
+
+                if (response == StartEndEnum.Start)
+                {
+                    return Ok(new { message = "Drive has started!" });
+                }
+                else 
+                {
+                    return Ok(new { message = "Drive has ended!" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message); 
+            }
+        }
 
     }
 }

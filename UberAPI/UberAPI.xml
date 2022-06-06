@@ -28,9 +28,15 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:UberAPI.Controllers.DriverController.SetLocation(UberAPI.Helpers.Cordinates)">
+            <summary>
+            Set drivers location manualy
+            </summary>
+            <param name="cordinates"></param>
+            <returns></returns>
+        </member>
         <member name="M:UberAPI.Controllers.PassangerController.GetClosestDrivers(UberAPI.Helpers.Cordinates)">
             <summary>
-            Not developed 
             Returns a list of twenty idle vehicles in his proximity
             </summary>
             <returns></returns>
@@ -38,6 +44,12 @@
         <member name="M:UberAPI.Controllers.PassangerController.SendReservationRequest(UberAPI.Models.Reservation)">
             <summary>
             Reserve vehicle
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:UberAPI.Controllers.PassangerController.CheckReservationRequest">
+            <summary>
+            Checking reservation request status and time from sending reservation request
             </summary>
             <returns></returns>
         </member>

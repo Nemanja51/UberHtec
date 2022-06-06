@@ -17,6 +17,8 @@
   <ItemGroup>
     <Compile Remove="Migrations\20220602144714_addedReservations.cs" />
     <Compile Remove="Migrations\20220602144714_addedReservations.Designer.cs" />
+    <Compile Remove="Migrations\20220606162522_addedReservationTimes.cs" />
+    <Compile Remove="Migrations\20220606162522_addedReservationTimes.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

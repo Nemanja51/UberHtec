@@ -11,6 +11,6 @@ namespace UberAPI.Repository.IRepository
         public List<DriversLocation> IdleVehiclesInProximity(Cordinates passangerCordinates);
         public void SendReservationRequest(Reservation reservation);
         public bool IsThereReservationRequestPending(int passangerId);
-        public ReservationStatusEnum SendReservationRequest(int passangerId);
+        public ReservationStatusCheck CheckRequestStatus(int passangerId);
     }
 }
