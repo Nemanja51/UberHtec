@@ -11,5 +11,8 @@
         public static string YouHaveAcceptedReservation = "You have ACCEPTED reservation!";
         public static string YouAreAvailable = "You are available!";
         public static string YouAreUnavailable = "You are unavailable!";
+        public static string DriveHasStarted = "Drive has started!";
+        public static string DriveHasEnded = "Drive has ended!";
+        public static string ThereAreNoReservations = "There are no reservations for loged in user!";
     }
 }

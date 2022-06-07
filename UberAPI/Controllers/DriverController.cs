@@ -102,14 +102,14 @@ namespace UberAPI.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost("acceptordeclinereservation")]
-        public IActionResult AcceptOrDeclineReservation([FromBody] Reservation reservationModel, ReservationDecisionEnum decision)
+        public IActionResult AcceptOrDeclineReservation(int reservationId, ReservationDecisionEnum decision)
         {
-            _driversRepo.AcceptOrDeclineReservation(reservationModel.Id, decision);
+            _driversRepo.AcceptOrDeclineReservation(reservationId, decision);
 
             if (decision == ReservationDecisionEnum.Accept) 
             {
                 //if driver accepts one then all others that are pending are going to be declined
-                _driversRepo.DeclineAllPendingRequests(Convert.ToInt32(User.Identity.Name), reservationModel.Id);
+                _driversRepo.DeclineAllPendingRequests(Convert.ToInt32(User.Identity.Name), reservationId);
                 return Ok(new { message = InfoConstants.YouHaveAcceptedReservation });
             }
             else if (decision == ReservationDecisionEnum.Decline)
@@ -145,11 +145,12 @@ namespace UberAPI.Controllers
 
                 if (response == StartEndEnum.Start)
                 {
-                    return Ok(new { message = "Drive has started!" });
+                    return Ok(new { message = InfoConstants.DriveHasStarted });
                 }
                 else 
                 {
-                    return Ok(new { message = "Drive has ended!" });
+                    //TODO: when drive is ended we need to print PDF recept
+                    return Ok(new { message = InfoConstants.DriveHasEnded });
                 }
             }
             catch (Exception ex)
@@ -158,5 +159,10 @@ namespace UberAPI.Controllers
             }
         }
 
+        //this should be customized with Authorization attribute and Role prop, but I cant find how
+        private void ChackAuthorization() 
+        {
+            //if user isnt driver return NotAuthorized()
+        }
     }
 }

@@ -12,5 +12,6 @@ namespace UberAPI.Repository.IRepository
         public void SendReservationRequest(Reservation reservation);
         public bool IsThereReservationRequestPending(int passangerId);
         public ReservationStatusCheck CheckRequestStatus(int passangerId);
+        public List<Reservation> ReservationHistory(int passangerId);
     }
 }

@@ -102,11 +102,28 @@ namespace UberAPI.Repository
         public void SetLocation(int driversId, Cordinates newLocation)
         {
             var driversLocation = _db.DriversLocations.Where(d=>d.DriversId == driversId).FirstOrDefault();
-            driversLocation.Latitude = newLocation.Latitude;
-            driversLocation.Longitude = newLocation.Longitude;
 
-            _db.DriversLocations.Update(driversLocation);
-            _db.SaveChanges();
+            if (driversLocation != null) 
+            {
+                driversLocation.Latitude = newLocation.Latitude;
+                driversLocation.Longitude = newLocation.Longitude;
+
+                _db.DriversLocations.Update(driversLocation);
+                _db.SaveChanges();
+            }
+            else
+            {
+                //this is used if driver is setting first time his location
+                DriversLocation dl = new DriversLocation() 
+                { 
+                    DriversId = driversId,
+                    Latitude = newLocation.Latitude,
+                    Longitude = newLocation.Longitude
+                };
+
+                _db.DriversLocations.Add(dl);
+                _db.SaveChanges();
+            }
         }
         public StartEndEnum StartEndDrive(int reservationId)
         {
@@ -116,16 +133,50 @@ namespace UberAPI.Repository
             {
                 //end
                 reservationTime.EndTime = DateTime.Now;
+                _db.ReservationTimes.Update(reservationTime);
+                _db.SaveChanges();
+
+                //if ride ended that means that driver is available again
+                ChangeDriversAvailability(true, reservationId);
+
                 return StartEndEnum.End;
             }
             else
             {
                 //start
-                reservationTime.Id = reservationId;
-                reservationTime.StartTime = DateTime.Now;
+                ReservationTime rt = new ReservationTime();
+                rt.ReservationId = reservationId;
+                rt.StartTime = DateTime.Now;
+
+                _db.ReservationTimes.Add(rt);
+                _db.SaveChanges();
+
+                //if ride started that means that driver is not available until ride is finished
+                ChangeDriversAvailability(false, reservationId);
+
                 return StartEndEnum.Start;
             }
 
+            async void ChangeDriversAvailability(bool isDriverAvailable, int reservationId) 
+            {
+                //first we need to find driver id for finding wright table entity to modify
+                int driversId = _db.Reservations.Where(d => d.Id == reservationId).Select(d => d.DriverId).FirstOrDefault();
+                var driversAvailiabilityObj = _db.DriversAvailability.Where(d => d.DriversId == driversId).FirstOrDefault();
+
+                if (isDriverAvailable)
+                {
+                    //set availability on true
+                    driversAvailiabilityObj.Available = true;
+                }
+                else
+                {
+                    //set availability on false
+                    driversAvailiabilityObj.Available = false;
+                }
+
+                _db.DriversAvailability.Update(driversAvailiabilityObj);
+                await _db.SaveChangesAsync();
+            }
         }
     }
 }

@@ -77,6 +77,11 @@ namespace UberAPI.Controllers
             var passangerId = Convert.ToInt32(User.Identity.Name);
             ReservationStatusCheck check = _passangerRepo.CheckRequestStatus(passangerId);
 
+            if (check == null)
+            {
+                return Ok(new { message = InfoConstants.ThereAreNoReservations });
+            }
+
             if (check.ReservationStatus == ReservationStatusEnum.Reserved)
             {
                 return Ok(new { message = InfoConstants.AcceptedReservation });
@@ -86,6 +91,19 @@ namespace UberAPI.Controllers
                 return Ok(new { message = InfoConstants.DeclinedReservation });
             }
             return Ok(new { message = InfoConstants.PendingReservation });
+        }
+
+        /// <summary>
+        /// Get list of reservations for logen in passanger
+        /// </summary>
+        /// <returns>List of reservations</returns>
+        [HttpGet("getreservationhistory")]
+        public IActionResult GetReservationHistory() 
+        {
+            var passangerId = Convert.ToInt32(User.Identity.Name);
+            List<Reservation> reservations = _passangerRepo.ReservationHistory(passangerId);
+
+            return Ok(reservations);
         }
 
 

@@ -16,6 +16,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:UberAPI.Controllers.DriverController.GetDriverWorkingState">
+            <summary>
+            This returns current working state of logged in driver
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:UberAPI.Controllers.DriverController.GetAllPendingReservations">
             <summary>
             Get all pending reservations for loged in Driver
@@ -58,6 +64,12 @@
             Checking reservation request status and time from sending reservation request
             </summary>
             <returns></returns>
+        </member>
+        <member name="M:UberAPI.Controllers.PassangerController.GetReservationHistory">
+            <summary>
+            Get list of reservations for logen in passanger
+            </summary>
+            <returns>List of reservations</returns>
         </member>
         <member name="M:UberAPI.Controllers.UsersController.Authenticate(UberAPI.Models.User)">
             <summary>

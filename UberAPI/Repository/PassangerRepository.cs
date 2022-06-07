@@ -21,7 +21,7 @@ namespace UberAPI.Repository
         public List<DriversLocation> IdleVehiclesInProximity(Cordinates passangerCordinates)
         {
             //ordered drivers by location
-            var closestDriversOrdered = _db.DriversLocations.OrderByDescending(x =>
+            var closestDriversOrdered = _db.DriversLocations.OrderBy(x =>
                (passangerCordinates.Latitude - x.Latitude) * (passangerCordinates.Latitude - x.Latitude) 
                + (passangerCordinates.Longitude - x.Longitude) * (passangerCordinates.Longitude - x.Longitude));
 
@@ -75,6 +75,13 @@ namespace UberAPI.Repository
         public ReservationStatusCheck CheckRequestStatus(int passangerId)
         {
             Reservation reservation = _db.Reservations.Where(s => s.PassangerId == passangerId).FirstOrDefault();
+
+            //there are no reservations
+            if (reservation == null)
+            {
+                return null;
+            }
+
             TimeSpan timePassed = DateTime.Now - reservation.ReservationTime;
             ReservationStatusCheck resCheck = new ReservationStatusCheck();
 
@@ -96,6 +103,12 @@ namespace UberAPI.Repository
             resCheck.ReservationTimePassed = timePassed;
 
             return resCheck;
+        }
+
+        public List<Reservation> ReservationHistory(int passangerId)
+        {
+            List<Reservation> reservationsList = _db.Reservations.Where(p=>p.PassangerId == passangerId).ToList();
+            return reservationsList;
         }
     }
 }
