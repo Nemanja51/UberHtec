@@ -8,6 +8,7 @@ using System.Text;
 using UberAPI.Data;
 using UberAPI.Helpers.Constants;
 using UberAPI.Models;
+using UberAPI.Models.Driver;
 using UberAPI.Repository.IRepository;
 
 namespace UberAPI.Repository
@@ -82,6 +83,7 @@ namespace UberAPI.Repository
                     LicensePlate = user.LicensePlate,
                     PricePerKm = user.PricePerKm
                 };
+
             }
             else
             {
@@ -98,6 +100,19 @@ namespace UberAPI.Repository
             _db.Users.Add(userObj);
             _db.SaveChanges();
             userObj.Password = "";
+
+            //when driver is registrated by default he is going to be UNAVAILABLE
+            if (user.Role == RolesConstants.Driver)
+            {
+                DriversAvailability daObj = new DriversAvailability()
+                {
+                    Available = false,
+                    DriversId = userObj.Id
+                };
+
+                _db.DriversAvailability.Add(daObj);
+                _db.SaveChanges();
+            }
 
             return userObj;
         }

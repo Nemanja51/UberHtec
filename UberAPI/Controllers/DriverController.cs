@@ -40,8 +40,8 @@ namespace UberAPI.Controllers
         /// This method is used to change drivers availability 
         /// </summary>
         /// <returns></returns>
-        [HttpPost("driversworkingstate")]
-        public IActionResult DriversWorkingState([FromBody] DriversAvailability da)
+        [HttpPut("driversworkingstate")]
+        public IActionResult DriversWorkingState()
         {
             var logedInUserId = User.Identity.Name;
 
@@ -51,8 +51,37 @@ namespace UberAPI.Controllers
                 return BadRequest(new { message = ErrorConstants.DriverStateError });
             }
 
-            _driversRepo.SetDriversWorkingState(logedInUserId, da.Available);
-            return Ok();
+            bool availability = _driversRepo.SetDriversWorkingState(logedInUserId);
+
+            if (availability)
+            {
+                return Ok(new {  message = InfoConstants.YouAreAvailable});
+            }
+            else
+            {
+                return Ok(new { message = InfoConstants.YouAreUnavailable });
+            }
+        }
+
+        /// <summary>
+        /// This returns current working state of logged in driver
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("getdriversworkingstate")]
+        public IActionResult GetDriverWorkingState() 
+        {
+            var logedInUserId = Convert.ToInt32(User.Identity.Name);
+
+            bool isAvailability = _driversRepo.GetDriversWorkingState(logedInUserId);
+
+            if (isAvailability)
+            {
+                return Ok(new { message = InfoConstants.YouAreAvailable });
+            }
+            else
+            {
+                return Ok(new { message = InfoConstants.YouAreUnavailable });
+            }
         }
 
         /// <summary>

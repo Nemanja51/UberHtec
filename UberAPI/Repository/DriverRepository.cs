@@ -25,27 +25,31 @@ namespace UberAPI.Repository
         {
             return _db.Users.Where(x => x.Role == RolesConstants.Driver).ToList();
         }
-        public void SetDriversWorkingState(string driversId, bool availability)
+        public bool SetDriversWorkingState(string driversId)
         {
             //find drivers id in table
-            DriversAvailability da = _db.DriversAvailability.Where(u=>u.DriversId == Convert.ToInt32(driversId)).FirstOrDefault();
-            
-            //if there isnt id add it and set status
-            if (da == null)
-            {
-                DriversAvailability newDaObj = new DriversAvailability();
-                newDaObj.Available = availability;
-                newDaObj.DriversId = Convert.ToInt32(driversId);
-                _db.DriversAvailability.Add(newDaObj);
-                _db.SaveChanges();
+            var daObj = _db.DriversAvailability.Where(u => u.DriversId == Convert.ToInt32(driversId)).FirstOrDefault();
+            bool availability = daObj.Available;
+
+            if (availability) 
+            { 
+                daObj.Available = false;
             }
-            //if there is, only set status
             else
             {
-                da.Available = availability;
-                _db.DriversAvailability.Update(da);
-                _db.SaveChanges();
+                daObj.Available = true;
             }
+
+            _db.DriversAvailability.Update(daObj);
+            _db.SaveChanges();
+
+            return daObj.Available;
+            
+        }
+        public bool GetDriversWorkingState(int driversId) 
+        {
+            bool availability = _db.DriversAvailability.Where(u => u.DriversId == Convert.ToInt32(driversId)).Select(u=>u.Available).FirstOrDefault();
+            return availability;
         }
         public bool IsUserDriver(string driversId)
         {

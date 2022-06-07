@@ -8,7 +8,8 @@ namespace UberAPI.Repository.IRepository
     public interface IDriversRepository
     {
         List<User> GetAllDrivers();
-        void SetDriversWorkingState(string driversId, bool availability);
+        bool SetDriversWorkingState(string driversId);
+        bool GetDriversWorkingState(int driversId);
         bool IsUserDriver(string driversId);
         List<Reservation> GetAllPendingReservations(int driversId);
         void AcceptOrDeclineReservation(int reservationId, ReservationDecisionEnum decision);

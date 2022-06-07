@@ -9,5 +9,7 @@
         public static string PendingReservationBePatient = "You have alreay pending request, please be patient!";
         public static string YouHaveDeclinedReservation = "You have DECLINED reservation!";
         public static string YouHaveAcceptedReservation = "You have ACCEPTED reservation!";
+        public static string YouAreAvailable = "You are available!";
+        public static string YouAreUnavailable = "You are unavailable!";
     }
 }

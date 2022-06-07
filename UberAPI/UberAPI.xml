@@ -10,7 +10,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:UberAPI.Controllers.DriverController.DriversWorkingState(UberAPI.Models.Driver.DriversAvailability)">
+        <member name="M:UberAPI.Controllers.DriverController.DriversWorkingState">
             <summary>
             This method is used to change drivers availability 
             </summary>
@@ -33,6 +33,12 @@
             Set drivers location manualy
             </summary>
             <param name="cordinates"></param>
+            <returns></returns>
+        </member>
+        <member name="M:UberAPI.Controllers.DriverController.StartEndDrive(System.Int32)">
+            <summary>
+            Start / End drive
+            </summary>
             <returns></returns>
         </member>
         <member name="M:UberAPI.Controllers.PassangerController.GetClosestDrivers(UberAPI.Helpers.Cordinates)">
