@@ -5,7 +5,7 @@ namespace UberAPI.Repository.IRepository
 {
     public interface IUserRepository
     {
-        bool IsUserUnique(string firstName, string lastName);
+        Task<bool> IsUserUnique(string firstName, string lastName);
         Task<User> Authenticate(string firstName, string lastName, string password);
         Task<User> Register(User user);
     }

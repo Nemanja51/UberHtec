@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using UberAPI.CQRS.Users.Commands;
+using UberAPI.CQRS.Users.Queries;
 using UberAPI.Helpers.Constants;
 using UberAPI.Models;
 using UberAPI.Repository.IRepository;
@@ -13,10 +16,10 @@ namespace UberAPI.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly IUserRepository _userRepo;
-        public UsersController(IUserRepository userRepo)
+        private readonly IMediator _mediator;
+        public UsersController(IMediator mediator)
         {
-            _userRepo = userRepo;
+            _mediator = mediator;
         }
 
         /// <summary>
@@ -28,7 +31,7 @@ namespace UberAPI.Controllers
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody] User userModel) 
         {
-            var user = _userRepo.Authenticate(userModel.FirstName, userModel.LastName, userModel.Password);
+            var user = _mediator.Send( new AuthenticateQuery() { FirstName = userModel.FirstName, LastName = userModel.LastName, Password = userModel.Password });
 
             //if we get null that means that there is no user with this credentials
             if (user == null)
@@ -56,8 +59,13 @@ namespace UberAPI.Controllers
             }
 
             //checking is there already registraded user with same credencials
-            bool isUsernameUnique = _userRepo.IsUserUnique(userModel.FirstName, userModel.LastName);
-            if (!isUsernameUnique)
+            var isUsernameUnique = _mediator.Send(new IsUserUniqueQuery() 
+            { 
+                FirstName = userModel.FirstName,
+                LastName = userModel.LastName 
+            });
+
+            if (!isUsernameUnique.Result)
             {
                 return BadRequest(new { message = ErrorConstants.UserAlreadyExist });
             }
@@ -85,7 +93,18 @@ namespace UberAPI.Controllers
 
             //if everything is fine so far we are registrating user
             //if we get null that means something went wrong
-            var user = _userRepo.Register(userModel);
+            var user = _mediator.Send(new RegisterCommand() 
+            { 
+                Email = userModel.Email, 
+                Password = userModel.Password, 
+                LastName = userModel.LastName, 
+                FirstName = userModel.FirstName, 
+                LicensePlate = userModel.LicensePlate, 
+                PricePerKm = userModel.PricePerKm, 
+                Role = userModel.Role, 
+                VehicleBrand = userModel.VehicleBrand 
+            });
+
             if (user == null)
             {
                 return BadRequest(new { message = ErrorConstants.ErrorWhileRegistrating });

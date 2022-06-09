@@ -53,9 +53,10 @@ namespace UberAPI.Repository
             user.Password = "";
             return user;
         }
-        public bool IsUserUnique(string firstName, string lastName)
+        public async Task<bool> IsUserUnique(string firstName, string lastName)
         {
-            var user = _db.Users.SingleOrDefault(x=>x.FirstName == firstName && x.LastName == lastName);
+            var user = await _db.Users
+                .SingleOrDefaultAsync(x=>x.FirstName == firstName && x.LastName == lastName);
 
             if (user == null)
             {

@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 using UberAPI.Data;
 using UberAPI.Repository;
 using UberAPI.Repository.IRepository;
+using MediatR;
 
 namespace UberAPI
 {
@@ -44,6 +45,8 @@ namespace UberAPI
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IDriversRepository, DriverRepository>();
             services.AddScoped<IPassangerRepository, PassangerRepository>();
+
+            services.AddMediatR(Assembly.GetExecutingAssembly());
 
             services.AddControllers();
 
