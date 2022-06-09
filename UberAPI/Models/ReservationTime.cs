@@ -8,7 +8,7 @@ namespace UberAPI.Models
         public int Id { get; set; }
         public int ReservationId { get; set; }
         public DateTime StartTime { get; set; }
-        public DateTime? EndTime { get; set; }
+        public DateTime EndTime { get; set; }
 
         //fk
         [ForeignKey("ReservationId")]

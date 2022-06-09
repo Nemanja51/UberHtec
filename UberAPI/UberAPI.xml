@@ -28,7 +28,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:UberAPI.Controllers.DriverController.AcceptOrDeclineReservation(UberAPI.Models.Reservation,UberAPI.Helpers.Enums.ReservationDecisionEnum)">
+        <member name="M:UberAPI.Controllers.DriverController.AcceptOrDeclineReservation(System.Int32,UberAPI.Helpers.Enums.ReservationDecisionEnum)">
             <summary>
             Accept or Decline reservation
             </summary>
@@ -70,6 +70,20 @@
             Get list of reservations for logen in passanger
             </summary>
             <returns>List of reservations</returns>
+        </member>
+        <member name="M:UberAPI.Controllers.PassangerController.SubmmitRate(UberAPI.Models.Passanger.RateDriver)">
+            <summary>
+            Rating driver from 1 to 5 with comment
+            </summary>
+            <param name="rateDriver"></param>
+            <returns></returns>
+        </member>
+        <member name="M:UberAPI.Controllers.PassangerController.GetRecept(System.Int32)">
+            <summary>
+            Download pdf recept 
+            </summary>
+            <param name="reservationId"></param>
+            <returns></returns>
         </member>
         <member name="M:UberAPI.Controllers.UsersController.Authenticate(UberAPI.Models.User)">
             <summary>

@@ -99,6 +99,17 @@ namespace UberAPI.Repository
             _db.SaveChanges();
 
         }
+        public void DeclineReservationAfter2MinsOfPending(int reservationId)
+        {
+            var reservation = _db.Reservations.Where(r => r.Id == reservationId).FirstOrDefault();
+            if (reservation.ReservationStatus == ReservationStatusEnum.Pending)
+            {
+                reservation.ReservationStatus = ReservationStatusEnum.Declined;
+
+                _db.Reservations.Update(reservation);
+                _db.SaveChanges();
+            }
+        }
         public void SetLocation(int driversId, Cordinates newLocation)
         {
             var driversLocation = _db.DriversLocations.Where(d=>d.DriversId == driversId).FirstOrDefault();

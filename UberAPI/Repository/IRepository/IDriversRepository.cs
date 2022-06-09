@@ -14,6 +14,7 @@ namespace UberAPI.Repository.IRepository
         List<Reservation> GetAllPendingReservations(int driversId);
         void AcceptOrDeclineReservation(int reservationId, ReservationDecisionEnum decision);
         void DeclineAllPendingRequests(int driversId, int reservationId);
+        void DeclineReservationAfter2MinsOfPending(int reservationId);
         void SetLocation(int driversId, Cordinates newLocation);
         StartEndEnum StartEndDrive(int reservationId);
     }

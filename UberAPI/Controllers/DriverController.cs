@@ -32,8 +32,15 @@ namespace UberAPI.Controllers
         [HttpGet("getalldrivers")]
         public IActionResult GetAllDrivers()
         {
-            var drivers = _driversRepo.GetAllDrivers();
-            return Ok(drivers.Take(1000));
+            try
+            {
+                var drivers = _driversRepo.GetAllDrivers();
+                return Ok(drivers.Take(1000));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         /// <summary>
@@ -43,23 +50,30 @@ namespace UberAPI.Controllers
         [HttpPut("driversworkingstate")]
         public IActionResult DriversWorkingState()
         {
-            var logedInUserId = User.Identity.Name;
-
-            //other users then Driver arent authorize to use this but this is just double check
-            if (!_driversRepo.IsUserDriver(logedInUserId))
+            try
             {
-                return BadRequest(new { message = ErrorConstants.DriverStateError });
+                var logedInUserId = User.Identity.Name;
+
+                //other users then Driver arent authorize to use this but this is just double check
+                if (!_driversRepo.IsUserDriver(logedInUserId))
+                {
+                    return BadRequest(new { message = ErrorConstants.DriverStateError });
+                }
+
+                bool availability = _driversRepo.SetDriversWorkingState(logedInUserId);
+
+                if (availability)
+                {
+                    return Ok(new { message = InfoConstants.YouAreAvailable });
+                }
+                else
+                {
+                    return Ok(new { message = InfoConstants.YouAreUnavailable });
+                }
             }
-
-            bool availability = _driversRepo.SetDriversWorkingState(logedInUserId);
-
-            if (availability)
+            catch (Exception ex)
             {
-                return Ok(new {  message = InfoConstants.YouAreAvailable});
-            }
-            else
-            {
-                return Ok(new { message = InfoConstants.YouAreUnavailable });
+                return BadRequest(ex.Message);
             }
         }
 
@@ -70,17 +84,24 @@ namespace UberAPI.Controllers
         [HttpGet("getdriversworkingstate")]
         public IActionResult GetDriverWorkingState() 
         {
-            var logedInUserId = Convert.ToInt32(User.Identity.Name);
-
-            bool isAvailability = _driversRepo.GetDriversWorkingState(logedInUserId);
-
-            if (isAvailability)
+            try
             {
-                return Ok(new { message = InfoConstants.YouAreAvailable });
+                var logedInUserId = Convert.ToInt32(User.Identity.Name);
+
+                bool isAvailability = _driversRepo.GetDriversWorkingState(logedInUserId);
+
+                if (isAvailability)
+                {
+                    return Ok(new { message = InfoConstants.YouAreAvailable });
+                }
+                else
+                {
+                    return Ok(new { message = InfoConstants.YouAreUnavailable });
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return Ok(new { message = InfoConstants.YouAreUnavailable });
+                return BadRequest(ex.Message);
             }
         }
 
@@ -91,10 +112,17 @@ namespace UberAPI.Controllers
         [HttpGet("getallpendindgreservations")]
         public IActionResult GetAllPendingReservations() 
         {
-            var logedInUserId = Convert.ToInt32(User.Identity.Name);
-            var reservations = _driversRepo.GetAllPendingReservations(logedInUserId);
+            try
+            {
+                var logedInUserId = Convert.ToInt32(User.Identity.Name);
+                var reservations = _driversRepo.GetAllPendingReservations(logedInUserId);
 
-            return Ok(reservations);
+                return Ok(reservations);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         /// <summary>
@@ -104,20 +132,30 @@ namespace UberAPI.Controllers
         [HttpPost("acceptordeclinereservation")]
         public IActionResult AcceptOrDeclineReservation(int reservationId, ReservationDecisionEnum decision)
         {
-            _driversRepo.AcceptOrDeclineReservation(reservationId, decision);
+            //setting timer in case that reservation goes on pending longer then 2 mins
+            TimerHelper.SetTimer(reservationId);
 
-            if (decision == ReservationDecisionEnum.Accept) 
+            try
             {
-                //if driver accepts one then all others that are pending are going to be declined
-                _driversRepo.DeclineAllPendingRequests(Convert.ToInt32(User.Identity.Name), reservationId);
-                return Ok(new { message = InfoConstants.YouHaveAcceptedReservation });
-            }
-            else if (decision == ReservationDecisionEnum.Decline)
-            {
-                return Ok(new { message = InfoConstants.YouHaveDeclinedReservation });
-            }
+                _driversRepo.AcceptOrDeclineReservation(reservationId, decision);
 
-            return Ok();
+                if (decision == ReservationDecisionEnum.Accept)
+                {
+                    //if driver accepts one then all others that are pending are going to be declined
+                    _driversRepo.DeclineAllPendingRequests(Convert.ToInt32(User.Identity.Name), reservationId);
+                    return Ok(new { message = InfoConstants.YouHaveAcceptedReservation });
+                }
+                else if (decision == ReservationDecisionEnum.Decline)
+                {
+                    return Ok(new { message = InfoConstants.YouHaveDeclinedReservation });
+                }
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         /// <summary>
@@ -128,8 +166,15 @@ namespace UberAPI.Controllers
         [HttpPost("setdriverslocation")]
         public IActionResult SetLocation(Cordinates cordinates) 
         {
-            _driversRepo.SetLocation(Convert.ToInt32(User.Identity.Name), cordinates);
-            return Ok();
+            try
+            {
+                _driversRepo.SetLocation(Convert.ToInt32(User.Identity.Name), cordinates);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         /// <summary>

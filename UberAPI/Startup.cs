@@ -45,8 +45,6 @@ namespace UberAPI
             services.AddScoped<IDriversRepository, DriverRepository>();
             services.AddScoped<IPassangerRepository, PassangerRepository>();
 
-
-
             services.AddControllers();
 
             services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
