@@ -1,5 +1,6 @@
 ﻿using IronPdf;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UberAPI.Helpers;
 using UberAPI.Helpers.Enums;
 using UberAPI.Models;
@@ -10,12 +11,12 @@ namespace UberAPI.Repository.IRepository
 {
     public interface IPassangerRepository
     {
-        public List<DriversLocation> IdleVehiclesInProximity(Cordinates passangerCordinates);
-        public void SendReservationRequest(Reservation reservation);
-        public bool IsThereReservationRequestPending(int passangerId);
-        public ReservationStatusCheck CheckRequestStatus(int passangerId);
-        public List<Reservation> ReservationHistory(int passangerId);
-        public string SubmmitRaiting(RateDriver rateDriver);
-        public PdfDocument CreateRecept(int reservationId);
+        public Task<List<DriversLocation>> IdleVehiclesInProximity(Cordinates passangerCordinates);
+        public Task SendReservationRequest(Reservation reservation);
+        public Task<bool> IsThereReservationRequestPending(int passangerId);
+        public Task<ReservationStatusCheck> CheckRequestStatus(int passangerId);
+        public Task<List<Reservation>> ReservationHistory(int passangerId);
+        public Task<string> SubmmitRaiting(RateDriver rateDriver);
+        public Task<PdfDocument> CreateRecept(int reservationId);
     }
 }

@@ -11,6 +11,7 @@ using UberAPI.Repository.IRepository;
 using IronPdf;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace UberAPI.Repository
 {
@@ -22,7 +23,7 @@ namespace UberAPI.Repository
         {
             _db = db;
         }
-        public List<DriversLocation> IdleVehiclesInProximity(Cordinates passangerCordinates)
+        public async Task<List<DriversLocation>> IdleVehiclesInProximity(Cordinates passangerCordinates)
         {
             //ordered drivers by location
             var closestDriversOrdered = _db.DriversLocations.OrderBy(x =>
@@ -37,7 +38,7 @@ namespace UberAPI.Repository
             {
                 if (driversCount == 20) break;
 
-                bool available = _db.DriversAvailability.Where(d=>d.DriversId == driver.Id).Select(u=>u.Available).FirstOrDefault();
+                bool available = await _db.DriversAvailability.Where(d=>d.DriversId == driver.Id).Select(u=>u.Available).FirstOrDefaultAsync();
 
                 if (available)
                 {
@@ -48,16 +49,18 @@ namespace UberAPI.Repository
             ClossestActiveDrivers = dl;
             return dl;
         }
-        public void SendReservationRequest(Reservation reservation)
+        public async Task SendReservationRequest(Reservation reservation)
         {
             _db.Reservations.Add(reservation);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
         }
-        public bool IsThereReservationRequestPending(int passangerId)
+        public async Task<bool> IsThereReservationRequestPending(int passangerId)
         {
-            var reservations = _db.Reservations.Where(r => r.PassangerId == passangerId && r.ReservationStatus == ReservationStatusEnum.Pending);
+            var reservations = _db.Reservations
+                .Where(r => r.PassangerId == passangerId && r.ReservationStatus == ReservationStatusEnum.Pending)
+                .ToListAsync();
 
-            if (reservations.Any())
+            if (reservations.Result.Count > 0)
             {
                 return true;
             }
@@ -66,9 +69,11 @@ namespace UberAPI.Repository
                 return false;
             }
         }
-        public ReservationStatusCheck CheckRequestStatus(int passangerId)
+        public async Task<ReservationStatusCheck> CheckRequestStatus(int passangerId)
         {
-            Reservation reservation = _db.Reservations.Where(s => s.PassangerId == passangerId).FirstOrDefault();
+            Reservation reservation = await _db.Reservations
+                .Where(s => s.PassangerId == passangerId)
+                .FirstOrDefaultAsync();
 
             //there are no reservations
             if (reservation == null)
@@ -89,7 +94,7 @@ namespace UberAPI.Repository
                     reservation.ReservationStatus = ReservationStatusEnum.Declined;
 
                     _db.Reservations.Update(reservation);
-                    _db.SaveChanges();
+                    await _db.SaveChangesAsync();
                 }
             }
 
@@ -98,21 +103,24 @@ namespace UberAPI.Repository
 
             return resCheck;
         }
-        public List<Reservation> ReservationHistory(int passangerId)
+        public async Task<List<Reservation>> ReservationHistory(int passangerId)
         {
-            List<Reservation> reservationsList = _db.Reservations.Where(p=>p.PassangerId == passangerId).ToList();
+            List<Reservation> reservationsList = await _db.Reservations.Where(p=>p.PassangerId == passangerId).ToListAsync();
             return reservationsList;
         }
-        public string SubmmitRaiting(RateDriver rateDriver)
+        public async Task<string> SubmmitRaiting(RateDriver rateDriver)
         {
             //first we need to check was there accepted reservation in 24h from now
-            Reservation reservation = _db.Reservations.Where(r => r.PassangerId == rateDriver.PassangerId
-            && r.DriverId == rateDriver.DriverId && r.ReservationStatus == ReservationStatusEnum.Reserved).OrderByDescending(s => s.Id).FirstOrDefault();
+            Reservation reservation = await _db.Reservations
+                .Where(r => r.PassangerId == rateDriver.PassangerId
+            && r.DriverId == rateDriver.DriverId && r.ReservationStatus == ReservationStatusEnum.Reserved)
+                .OrderByDescending(s => s.Id)
+                .FirstOrDefaultAsync();
 
             if (reservation == null)
                 return "There was no reservation for this driver!"; //there was no reservation at all for this driver from this passanger
 
-            var reservationTime = _db.ReservationTimes.Where(rt=>rt.ReservationId == reservation.Id).FirstOrDefault();
+            var reservationTime = await _db.ReservationTimes.Where(rt=>rt.ReservationId == reservation.Id).FirstOrDefaultAsync();
 
             if (reservationTime.EndTime < reservationTime.StartTime)
             {
@@ -127,21 +135,25 @@ namespace UberAPI.Repository
             }
 
             _db.DriverRates.Add(rateDriver);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
 
             return "You have successfully leaved a rating!";
         }
-        public PdfDocument CreateRecept(int reservationId)
+        public async Task<PdfDocument> CreateRecept(int reservationId)
         {
-            var reservation = _db.Reservations.Where(r=>r.Id == reservationId).Include(d=>d.Driver).FirstOrDefault();
+            var reservation = await _db.Reservations
+                .Where(r=>r.Id == reservationId)
+                .Include(d=>d.Driver)
+                .FirstOrDefaultAsync();
+
             Recept recept = new Recept()
             {
                 DriversFullName = reservation.Driver.FirstName + " " + reservation.Driver.LastName,
                 VehicleBrand = reservation.Driver.VehicleBrand,
                 LicancePlate = reservation.Driver.LicensePlate,
                 Milage = CalculateMilage(reservation)
-                
             };
+
             recept.TotalPrice = CalculatePrice(recept.Milage, reservation.Driver.PricePerKm);
 
             var htmlToPdf = new HtmlToPdf();

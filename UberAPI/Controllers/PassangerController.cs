@@ -9,6 +9,9 @@ using UberAPI.Repository.IRepository;
 using UberAPI.Helpers.Constants;
 using UberAPI.Models.Passanger;
 using System.IO;
+using MediatR;
+using UberAPI.CQRS.Passanger.Queries;
+using UberAPI.CQRS.Passanger.Commands;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -19,10 +22,10 @@ namespace UberAPI.Controllers
     [Authorize]
     public class PassangerController : ControllerBase
     {
-        private readonly IPassangerRepository _passangerRepo;
-        public PassangerController(IPassangerRepository passangerRepo)
+        private readonly IMediator _mediator;
+        public PassangerController(IMediator mediator)
         {
-            _passangerRepo = passangerRepo;
+            _mediator = mediator;
         }
 
         /// <summary>
@@ -35,8 +38,11 @@ namespace UberAPI.Controllers
             try
             {
                 Log.Instance.Trace("Passanger is searching for clossest drivers...");
-                var closestDriversLocations = _passangerRepo.IdleVehiclesInProximity(passangerCordinates);
-                return Ok(closestDriversLocations);
+                var closestDriversLocations = _mediator.Send(new IdleVehiclesInProximityQuery() 
+                { 
+                    Cordinates = passangerCordinates 
+                });
+                return Ok(closestDriversLocations.Result);
             }
             catch (Exception ex)
             {
@@ -58,7 +64,7 @@ namespace UberAPI.Controllers
 
                 //if there is already reservation request for pasanger on pending
                 //passanger can not make another request
-                if (_passangerRepo.IsThereReservationRequestPending(passangerId))
+                if (_mediator.Send(new IsThereReservationRequestPendingQuery() { PassangerId = passangerId }).Result)
                 {
                     //there is pending request
                     return Ok(new { message = InfoConstants.PendingReservationBePatient });
@@ -68,7 +74,8 @@ namespace UberAPI.Controllers
                 reservation.ReservationStatus = ReservationStatusEnum.Pending;
                 reservation.ReservationTime = DateTime.Now;
 
-                _passangerRepo.SendReservationRequest(reservation);
+                _mediator.Send(new SendReservationRequestCommand() { Reservation = reservation });
+
                 Log.Instance.Trace($"Passanger {passangerId} sent reservation request.");
                 return Ok(new { message = InfoConstants.Reserved });
             }
@@ -90,7 +97,7 @@ namespace UberAPI.Controllers
             {
                 Log.Instance.Trace($"Passanger is trying to check reservation requests.");
                 var passangerId = Convert.ToInt32(User.Identity.Name);
-                ReservationStatusCheck check = _passangerRepo.CheckRequestStatus(passangerId);
+                ReservationStatusCheck check = _mediator.Send(new CheckRequestStatusQuery() { PassangerId = passangerId }).Result;
 
                 if (check == null)
                 {
@@ -129,7 +136,7 @@ namespace UberAPI.Controllers
             try
             {
                 var passangerId = Convert.ToInt32(User.Identity.Name);
-                List<Reservation> reservations = _passangerRepo.ReservationHistory(passangerId);
+                List<Reservation> reservations = _mediator.Send(new ReservationHistoryQuery() { PassangerId = passangerId }).Result;
 
                 return Ok(reservations);
             }
@@ -151,7 +158,7 @@ namespace UberAPI.Controllers
             {
                 rateDriver.PassangerId = Convert.ToInt32(User.Identity.Name);
                 rateDriver.DateTimeOfRate = DateTime.Now;
-                string message = _passangerRepo.SubmmitRaiting(rateDriver);
+                string message = _mediator.Send(new SubmmitRatingCommand() { RateDriver = rateDriver }).Result;
                 return Ok(message);
             }
             catch (Exception ex)
@@ -171,7 +178,7 @@ namespace UberAPI.Controllers
             try
             {
                 //create and save pdf
-                var pdf = _passangerRepo.CreateRecept(reservationId);
+                var pdf = _mediator.Send(new CreateReceptQuery() { ReservationId = reservationId }).Result;
                 string pdfPath = $"Recepts/UberRecept{reservationId}.pdf";
 
                 //if there is already pdf for reservation id dont create new
