@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using UberAPI.Helpers;
 using UberAPI.Helpers.Enums;
 using UberAPI.Models;
@@ -7,15 +8,15 @@ namespace UberAPI.Repository.IRepository
 {
     public interface IDriversRepository
     {
-        List<User> GetAllDrivers();
-        bool SetDriversWorkingState(string driversId);
-        bool GetDriversWorkingState(int driversId);
-        bool IsUserDriver(string driversId);
-        List<Reservation> GetAllPendingReservations(int driversId);
-        void AcceptOrDeclineReservation(int reservationId, ReservationDecisionEnum decision);
-        void DeclineAllPendingRequests(int driversId, int reservationId);
-        void DeclineReservationAfter2MinsOfPending(int reservationId);
-        void SetLocation(int driversId, Cordinates newLocation);
-        StartEndEnum StartEndDrive(int reservationId);
+        Task<List<User>> GetAllDrivers();
+        Task<bool> SetDriversWorkingState(string driversId);
+        Task<bool> GetDriversWorkingState(int driversId);
+        Task<bool> IsUserDriver(string driversId);
+        Task<List<Reservation>> GetAllPendingReservations(int driversId);
+        Task AcceptOrDeclineReservation(int reservationId, ReservationDecisionEnum decision);
+        Task DeclineAllPendingRequests(int driversId, int reservationId);
+        Task DeclineReservationAfter2MinsOfPending(int reservationId);
+        Task SetLocation(int driversId, Cordinates newLocation);
+        Task<StartEndEnum> StartEndDrive(int reservationId);
     }
 }

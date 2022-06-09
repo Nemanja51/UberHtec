@@ -11,6 +11,8 @@ using System;
 using UberAPI.Models.Driver;
 using UberAPI.Helpers.Enums;
 using UberAPI.Helpers;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace UberAPI.Repository
 {
@@ -21,14 +23,14 @@ namespace UberAPI.Repository
         {
             _db = db;
         }
-        public List<User> GetAllDrivers()
+        public async Task<List<User>> GetAllDrivers()
         {
-            return _db.Users.Where(x => x.Role == RolesConstants.Driver).ToList();
+            return await _db.Users.Where(x => x.Role == RolesConstants.Driver).ToListAsync();
         }
-        public bool SetDriversWorkingState(string driversId)
+        public async Task<bool> SetDriversWorkingState(string driversId)
         {
             //find drivers id in table
-            var daObj = _db.DriversAvailability.Where(u => u.DriversId == Convert.ToInt32(driversId)).FirstOrDefault();
+            var daObj = await _db.DriversAvailability.Where(u => u.DriversId == Convert.ToInt32(driversId)).FirstOrDefaultAsync();
             bool availability = daObj.Available;
 
             if (availability) 
@@ -41,33 +43,43 @@ namespace UberAPI.Repository
             }
 
             _db.DriversAvailability.Update(daObj);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
 
             return daObj.Available;
-            
         }
-        public bool GetDriversWorkingState(int driversId) 
+        public async Task<bool> GetDriversWorkingState(int driversId) 
         {
-            bool availability = _db.DriversAvailability.Where(u => u.DriversId == Convert.ToInt32(driversId)).Select(u=>u.Available).FirstOrDefault();
+            bool availability = await _db.DriversAvailability
+                .Where(u => u.DriversId == Convert.ToInt32(driversId))
+                .Select(u=>u.Available)
+                .FirstOrDefaultAsync();
+
             return availability;
         }
-        public bool IsUserDriver(string driversId)
+        public async Task<bool> IsUserDriver(string driversId)
         {
-            string role = _db.Users.Where(u=>u.Id == Convert.ToInt64(driversId)).Select(u=>u.Role).FirstOrDefault();
+            string role = await _db.Users
+                .Where(u=>u.Id == Convert.ToInt64(driversId))
+                .Select(u=>u.Role)
+                .FirstOrDefaultAsync();
+
             if (role.ToUpper().Equals(RolesConstants.Driver.ToUpper()))
             {
                 return true;
             }
             return false;
         }
-        public List<Reservation> GetAllPendingReservations(int driversId)
+        public async Task<List<Reservation>> GetAllPendingReservations(int driversId)
         {
-            var reservationStatus = _db.Reservations.Where(s => s.DriverId == driversId && s.ReservationStatus == ReservationStatusEnum.Pending).ToList();
+            var reservationStatus = await _db.Reservations
+                .Where(s => s.DriverId == driversId && s.ReservationStatus == ReservationStatusEnum.Pending)
+                .ToListAsync();
+
             return reservationStatus;
         }
-        public void AcceptOrDeclineReservation(int reservationId, ReservationDecisionEnum decision)
+        public async Task AcceptOrDeclineReservation(int reservationId, ReservationDecisionEnum decision)
         {
-            var reservation = _db.Reservations.Find(reservationId);
+            var reservation = await _db.Reservations.FindAsync(reservationId);
 
             switch (decision) 
             {
@@ -82,9 +94,9 @@ namespace UberAPI.Repository
             reservation.StatusChangeTime = DateTime.Now;
 
             _db.Reservations.Update(reservation);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
         }
-        public void DeclineAllPendingRequests(int driversId, int reservationId)
+        public async Task DeclineAllPendingRequests(int driversId, int reservationId)
         {
             //find all pending reservations for driver exept the one that is accepted
             var reservations = _db.Reservations.Where(d=>d.DriverId == driversId 
@@ -96,23 +108,22 @@ namespace UberAPI.Repository
             };
 
             _db.Reservations.UpdateRange(reservations);
-            _db.SaveChanges();
-
+            await _db.SaveChangesAsync();
         }
-        public void DeclineReservationAfter2MinsOfPending(int reservationId)
+        public async Task DeclineReservationAfter2MinsOfPending(int reservationId)
         {
-            var reservation = _db.Reservations.Where(r => r.Id == reservationId).FirstOrDefault();
+            var reservation = await _db.Reservations.Where(r => r.Id == reservationId).FirstOrDefaultAsync();
             if (reservation.ReservationStatus == ReservationStatusEnum.Pending)
             {
                 reservation.ReservationStatus = ReservationStatusEnum.Declined;
 
                 _db.Reservations.Update(reservation);
-                _db.SaveChanges();
+                await _db.SaveChangesAsync();
             }
         }
-        public void SetLocation(int driversId, Cordinates newLocation)
+        public async Task SetLocation(int driversId, Cordinates newLocation)
         {
-            var driversLocation = _db.DriversLocations.Where(d=>d.DriversId == driversId).FirstOrDefault();
+            var driversLocation = await _db.DriversLocations.Where(d=>d.DriversId == driversId).FirstOrDefaultAsync();
 
             if (driversLocation != null) 
             {
@@ -120,7 +131,7 @@ namespace UberAPI.Repository
                 driversLocation.Longitude = newLocation.Longitude;
 
                 _db.DriversLocations.Update(driversLocation);
-                _db.SaveChanges();
+                await _db.SaveChangesAsync();
             }
             else
             {
@@ -133,22 +144,22 @@ namespace UberAPI.Repository
                 };
 
                 _db.DriversLocations.Add(dl);
-                _db.SaveChanges();
+                await _db.SaveChangesAsync();
             }
         }
-        public StartEndEnum StartEndDrive(int reservationId)
+        public async Task<StartEndEnum> StartEndDrive(int reservationId)
         {
             //check should it be start or end
-            var reservationTime = _db.ReservationTimes.Where(rt=>rt.ReservationId == reservationId).FirstOrDefault();
+            var reservationTime = await _db.ReservationTimes.Where(rt=>rt.ReservationId == reservationId).FirstOrDefaultAsync();
             if (reservationTime != null)
             {
                 //end
                 reservationTime.EndTime = DateTime.Now;
                 _db.ReservationTimes.Update(reservationTime);
-                _db.SaveChanges();
+                await _db.SaveChangesAsync();
 
                 //if ride ended that means that driver is available again
-                ChangeDriversAvailability(true, reservationId);
+                await ChangeDriversAvailability(true, reservationId);
 
                 return StartEndEnum.End;
             }
@@ -160,19 +171,19 @@ namespace UberAPI.Repository
                 rt.StartTime = DateTime.Now;
 
                 _db.ReservationTimes.Add(rt);
-                _db.SaveChanges();
+                await _db.SaveChangesAsync();
 
                 //if ride started that means that driver is not available until ride is finished
-                ChangeDriversAvailability(false, reservationId);
+                await ChangeDriversAvailability(false, reservationId);
 
                 return StartEndEnum.Start;
             }
 
-            async void ChangeDriversAvailability(bool isDriverAvailable, int reservationId) 
+            async Task ChangeDriversAvailability(bool isDriverAvailable, int reservationId) 
             {
                 //first we need to find driver id for finding wright table entity to modify
-                int driversId = _db.Reservations.Where(d => d.Id == reservationId).Select(d => d.DriverId).FirstOrDefault();
-                var driversAvailiabilityObj = _db.DriversAvailability.Where(d => d.DriversId == driversId).FirstOrDefault();
+                int driversId = await _db.Reservations.Where(d => d.Id == reservationId).Select(d => d.DriverId).FirstOrDefaultAsync();
+                var driversAvailiabilityObj = await _db.DriversAvailability.Where(d => d.DriversId == driversId).FirstOrDefaultAsync();
 
                 if (isDriverAvailable)
                 {

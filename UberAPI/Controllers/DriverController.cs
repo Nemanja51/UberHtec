@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UberAPI.CQRS.Driver.Commands;
+using UberAPI.CQRS.Driver.Queries;
 using UberAPI.Helpers;
 using UberAPI.Helpers.Constants;
 using UberAPI.Helpers.Enums;
@@ -19,10 +22,10 @@ namespace UberAPI.Controllers
     [Authorize] //(Roles = RolesConstants.Driver)
     public class DriverController : ControllerBase
     {
-        private readonly IDriversRepository _driversRepo;
-        public DriverController(IDriversRepository driversRepo)
+        private readonly IMediator _mediator;
+        public DriverController(IMediator mediator)
         {
-            _driversRepo = driversRepo;
+            _mediator = mediator;
         }
 
         /// <summary>
@@ -34,8 +37,8 @@ namespace UberAPI.Controllers
         {
             try
             {
-                var drivers = _driversRepo.GetAllDrivers();
-                return Ok(drivers.Take(1000));
+                var drivers = _mediator.Send(new GetAllDriversQuery());
+                return Ok(drivers.Result.Take(1000));
             }
             catch (Exception ex)
             {
@@ -55,12 +58,15 @@ namespace UberAPI.Controllers
                 var logedInUserId = User.Identity.Name;
 
                 //other users then Driver arent authorize to use this but this is just double check
-                if (!_driversRepo.IsUserDriver(logedInUserId))
+                if (!_mediator.Send(new IsUserDriverQuery() { DriversId = logedInUserId }).Result)
                 {
                     return BadRequest(new { message = ErrorConstants.DriverStateError });
                 }
 
-                bool availability = _driversRepo.SetDriversWorkingState(logedInUserId);
+                bool availability = _mediator.Send(new SetDriverWorkingStateCommand() 
+                { 
+                    DriversId = logedInUserId 
+                }).Result;
 
                 if (availability)
                 {
@@ -88,7 +94,7 @@ namespace UberAPI.Controllers
             {
                 var logedInUserId = Convert.ToInt32(User.Identity.Name);
 
-                bool isAvailability = _driversRepo.GetDriversWorkingState(logedInUserId);
+                bool isAvailability = _mediator.Send(new GetDriversWorkingStateQuery() { DriversId = logedInUserId}).Result;
 
                 if (isAvailability)
                 {
@@ -115,9 +121,9 @@ namespace UberAPI.Controllers
             try
             {
                 var logedInUserId = Convert.ToInt32(User.Identity.Name);
-                var reservations = _driversRepo.GetAllPendingReservations(logedInUserId);
+                var reservations = _mediator.Send(new GetAllPendingReservationsQuery() { DriversId = logedInUserId });
 
-                return Ok(reservations);
+                return Ok(reservations.Result);
             }
             catch (Exception ex)
             {
@@ -137,12 +143,12 @@ namespace UberAPI.Controllers
 
             try
             {
-                _driversRepo.AcceptOrDeclineReservation(reservationId, decision);
+                _mediator.Send(new AcceptOrDeclineReservationCommand() { ReservationId = reservationId, Decision = decision });
 
                 if (decision == ReservationDecisionEnum.Accept)
                 {
                     //if driver accepts one then all others that are pending are going to be declined
-                    _driversRepo.DeclineAllPendingRequests(Convert.ToInt32(User.Identity.Name), reservationId);
+                    _mediator.Send(new DeclineAllPendingRequestsCommand() { DriversId = Convert.ToInt32(User.Identity.Name), ReservationId = reservationId });
                     return Ok(new { message = InfoConstants.YouHaveAcceptedReservation });
                 }
                 else if (decision == ReservationDecisionEnum.Decline)
@@ -168,7 +174,12 @@ namespace UberAPI.Controllers
         {
             try
             {
-                _driversRepo.SetLocation(Convert.ToInt32(User.Identity.Name), cordinates);
+                _mediator.Send(new SetLocationCommand() 
+                { 
+                    DriversId = Convert.ToInt32(User.Identity.Name),
+                    NewCordinates = cordinates 
+                });
+
                 return Ok();
             }
             catch (Exception ex)
@@ -186,7 +197,10 @@ namespace UberAPI.Controllers
         {
             try
             {
-                StartEndEnum response = _driversRepo.StartEndDrive(reservationId);
+                StartEndEnum response = _mediator.Send(new StartEndDriveCommand() 
+                { 
+                    ReservationId = reservationId 
+                }).Result;
 
                 if (response == StartEndEnum.Start)
                 {
