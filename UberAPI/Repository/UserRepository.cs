@@ -1,10 +1,12 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 using UberAPI.Data;
 using UberAPI.Helpers.Constants;
 using UberAPI.Models;
@@ -22,10 +24,10 @@ namespace UberAPI.Repository
             _db = db;
             _appSettings = appSettings.Value;
         }
-        public User Authenticate(string firstName, string lastName, string password)
+        public async Task<User> Authenticate(string firstName, string lastName, string password)
         {
-            var user = _db.Users
-                .SingleOrDefault(x=>x.FirstName == firstName && x.LastName == lastName && x.Password == password);
+            var user = await _db.Users
+                .SingleOrDefaultAsync(x => x.FirstName == firstName && x.LastName == lastName && x.Password == password);
 
             //user not found
             if (user == null)
@@ -51,7 +53,6 @@ namespace UberAPI.Repository
             user.Password = "";
             return user;
         }
-
         public bool IsUserUnique(string firstName, string lastName)
         {
             var user = _db.Users.SingleOrDefault(x=>x.FirstName == firstName && x.LastName == lastName);
@@ -65,8 +66,7 @@ namespace UberAPI.Repository
                 return false;
             }
         }
-
-        public User Register(User user)
+        public async Task<User> Register(User user)
         {
             User userObj = new User();
 
@@ -98,7 +98,7 @@ namespace UberAPI.Repository
             }
 
             _db.Users.Add(userObj);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
             userObj.Password = "";
 
             //when driver is registrated by default he is going to be UNAVAILABLE
@@ -111,7 +111,7 @@ namespace UberAPI.Repository
                 };
 
                 _db.DriversAvailability.Add(daObj);
-                _db.SaveChanges();
+                await _db.SaveChangesAsync();
             }
 
             return userObj;

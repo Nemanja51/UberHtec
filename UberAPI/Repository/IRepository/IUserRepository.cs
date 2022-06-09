@@ -1,11 +1,12 @@
-﻿using UberAPI.Models;
+﻿using System.Threading.Tasks;
+using UberAPI.Models;
 
 namespace UberAPI.Repository.IRepository
 {
     public interface IUserRepository
     {
         bool IsUserUnique(string firstName, string lastName);
-        User Authenticate(string firstName, string lastName, string password);
-        User Register(User user);
+        Task<User> Authenticate(string firstName, string lastName, string password);
+        Task<User> Register(User user);
     }
 }
