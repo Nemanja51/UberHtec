@@ -21,7 +21,6 @@ namespace Uber.Bussines.CQRS.Users.Commands
         {
             User user = new User()
             {
-                Id = command.,
                 FirstName = command.FirstName,
                 LastName = command.LastName,
                 Email = command.Email,
@@ -33,7 +32,21 @@ namespace Uber.Bussines.CQRS.Users.Commands
                 
             };
 
-            return await _userRepository.Register(user);
+            var userObj = await _userRepository.Register(user);
+
+            return new UserResponse()
+            {
+                Id = userObj.Id,
+                FirstName = userObj.FirstName,
+                LastName = userObj.LastName,
+                Password = userObj.Password,
+                Email = userObj.Email,
+                Role = userObj.Role,
+                Token = userObj.Token,
+                VehicleBrand = userObj.VehicleBrand,
+                LicensePlate = userObj.LicensePlate,
+                PricePerKm = userObj.PricePerKm
+            };
         }
     }
 
