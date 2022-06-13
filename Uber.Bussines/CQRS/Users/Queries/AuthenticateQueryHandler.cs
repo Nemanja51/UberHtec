@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Uber.Boundary.CQRS.Users;

@@ -1,11 +1,11 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using UberAPI.CQRS.Users.Commands;
-using UberAPI.CQRS.Users.Queries;
+using Uber.Boundary.CQRS.Users.Commands;
+using Uber.Boundary.CQRS.Users.Queries;
+using Uber.Bussines.CQRS.Users.Queries;
+using UberAPI.Helpers;
 using UberAPI.Helpers.Constants;
-using UberAPI.Models;
-using UberAPI.Repository.IRepository;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -29,17 +29,17 @@ namespace UberAPI.Controllers
         /// <returns></returns>
         [AllowAnonymous]
         [HttpPost("authenticate")]
-        public IActionResult Authenticate([FromBody] User userModel) 
+        public IActionResult Authenticate([FromBody] UserModel userModel) 
         {
             var user = _mediator.Send( new AuthenticateQuery() { FirstName = userModel.FirstName, LastName = userModel.LastName, Password = userModel.Password });
 
             //if we get null that means that there is no user with this credentials
-            if (user == null)
+            if (user.Result == null)
             {
                 return BadRequest(new { message = ErrorConstants.IncorectCredentials });
             }
 
-            return Ok(user);
+            return Ok(user.Result);
         }
 
 
@@ -50,7 +50,7 @@ namespace UberAPI.Controllers
         /// <returns></returns>
         [AllowAnonymous]
         [HttpPost("register")]
-        public IActionResult Register([FromBody] User userModel) 
+        public IActionResult Register([FromBody] UserModel userModel) 
         {
             //checking are the Required fields populated
             if (!ModelState.IsValid)

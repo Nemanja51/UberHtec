@@ -1,28 +1,23 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
-using UberAPI.Data;
-using UberAPI.Repository;
-using UberAPI.Repository.IRepository;
 using MediatR;
+using Uber.Persistence.Data;
+using Uber.Persistence.Repository;
+using Uber.Domain.IRepository;
+using System.Linq;
+using Uber.Persistence;
 
 namespace UberAPI
 {
@@ -46,9 +41,13 @@ namespace UberAPI
             services.AddScoped<IDriversRepository, DriverRepository>();
             services.AddScoped<IPassangerRepository, PassangerRepository>();
 
-            services.AddMediatR(Assembly.GetExecutingAssembly());
+            //var assamblies = AppDomain.CurrentDomain.GetAssemblies().Where(x => x.FullName.Contains("Uber"));
+            //var tet = Assembly.GetAssembly(typeof(Uber.Bussines.AssemblyReference));
 
-            services.AddControllers();
+            services.AddMediatR(Assembly.GetAssembly(typeof(Uber.Bussines.AssemblyReference)), Assembly.GetAssembly(typeof(Uber.Boundary.AssemblyReference)));
+
+            services.AddControllers().AddNewtonsoftJson(x =>
+                x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore); ;
 
             services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 

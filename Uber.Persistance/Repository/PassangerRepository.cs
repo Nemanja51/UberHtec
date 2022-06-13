@@ -12,7 +12,7 @@ using Uber.Domain.Models;
 using Uber.Domain.Helpers;
 using Uber.Domain.Helpers.Enums;
 
-namespace Uber.Boundary.Repository
+namespace Uber.Persistence.Repository
 {
     public class PassangerRepository : IPassangerRepository
     {

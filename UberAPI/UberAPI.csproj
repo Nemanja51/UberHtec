@@ -15,10 +15,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Migrations\20220602144714_addedReservations.cs" />
-    <Compile Remove="Migrations\20220602144714_addedReservations.Designer.cs" />
-    <Compile Remove="Migrations\20220606162522_addedReservationTimes.cs" />
-    <Compile Remove="Migrations\20220606162522_addedReservationTimes.Designer.cs" />
+    <Compile Remove="CQRS\**" />
+    <Compile Remove="Data\**" />
+    <Compile Remove="Migrations\**" />
+    <Content Remove="CQRS\**" />
+    <Content Remove="Data\**" />
+    <Content Remove="Migrations\**" />
+    <EmbeddedResource Remove="CQRS\**" />
+    <EmbeddedResource Remove="Data\**" />
+    <EmbeddedResource Remove="Migrations\**" />
+    <None Remove="CQRS\**" />
+    <None Remove="Data\**" />
+    <None Remove="Migrations\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,6 +34,7 @@
     <PackageReference Include="MediatR" Version="10.0.1" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="10.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.0">
@@ -38,6 +47,12 @@
 
   <ItemGroup>
     <Folder Include="Recepts\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Uber.Bussines\Uber.Bussines.csproj" />
+    <ProjectReference Include="..\Uber.Persistance\Uber.Persistance.csproj" />
+    <ProjectReference Include="..\Uber.Repository\Uber.Boundary.csproj" />
   </ItemGroup>
 
 

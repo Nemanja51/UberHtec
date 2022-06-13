@@ -1,7 +1,6 @@
 ﻿using System;
-using UberAPI.Helpers.Enums;
 
-namespace UberAPI.Models
+namespace Uber.Boundary.Helpers
 {
     public class ReservationStatusCheck
     {

@@ -28,13 +28,13 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:UberAPI.Controllers.DriverController.AcceptOrDeclineReservation(System.Int32,UberAPI.Helpers.Enums.ReservationDecisionEnum)">
+        <member name="M:UberAPI.Controllers.DriverController.AcceptOrDeclineReservation(System.Int32,Uber.Boundary.Helpers.ReservationDecisionEnum)">
             <summary>
             Accept or Decline reservation
             </summary>
             <returns></returns>
         </member>
-        <member name="M:UberAPI.Controllers.DriverController.SetLocation(UberAPI.Helpers.Cordinates)">
+        <member name="M:UberAPI.Controllers.DriverController.SetLocation(Uber.Boundary.Helpers.Cordinates)">
             <summary>
             Set drivers location manualy
             </summary>
@@ -47,13 +47,13 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:UberAPI.Controllers.PassangerController.GetClosestDrivers(UberAPI.Helpers.Cordinates)">
+        <member name="M:UberAPI.Controllers.PassangerController.GetClosestDrivers(Uber.Boundary.Helpers.Cordinates)">
             <summary>
             Returns a list of twenty idle vehicles in his proximity
             </summary>
             <returns></returns>
         </member>
-        <member name="M:UberAPI.Controllers.PassangerController.SendReservationRequest(UberAPI.Models.Reservation)">
+        <member name="M:UberAPI.Controllers.PassangerController.SendReservationRequest(Uber.Boundary.Helpers.Reservation)">
             <summary>
             Reserve vehicle
             </summary>
@@ -71,7 +71,7 @@
             </summary>
             <returns>List of reservations</returns>
         </member>
-        <member name="M:UberAPI.Controllers.PassangerController.SubmmitRate(UberAPI.Models.Passanger.RateDriver)">
+        <member name="M:UberAPI.Controllers.PassangerController.SubmmitRate(Uber.Boundary.Helpers.RateDriver)">
             <summary>
             Rating driver from 1 to 5 with comment
             </summary>
@@ -85,14 +85,14 @@
             <param name="reservationId"></param>
             <returns></returns>
         </member>
-        <member name="M:UberAPI.Controllers.UsersController.Authenticate(UberAPI.Models.User)">
+        <member name="M:UberAPI.Controllers.UsersController.Authenticate(UberAPI.Helpers.UserModel)">
             <summary>
             Authenticate/log in user
             </summary>
             <param name="userModel"></param>
             <returns></returns>
         </member>
-        <member name="M:UberAPI.Controllers.UsersController.Register(UberAPI.Models.User)">
+        <member name="M:UberAPI.Controllers.UsersController.Register(UberAPI.Helpers.UserModel)">
             <summary>
             Registrating new user
             </summary>

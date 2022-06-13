@@ -3,15 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using UberAPI.Helpers;
-using UberAPI.Helpers.Enums;
-using UberAPI.Models;
-using UberAPI.Repository.IRepository;
 using UberAPI.Helpers.Constants;
-using UberAPI.Models.Passanger;
 using System.IO;
 using MediatR;
-using UberAPI.CQRS.Passanger.Queries;
-using UberAPI.CQRS.Passanger.Commands;
+using Uber.Boundary.CQRS.Passanger.Queries;
+using Uber.Boundary.Helpers;
+using Uber.Boundary.CQRS.Passanger.Commands;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -97,7 +94,7 @@ namespace UberAPI.Controllers
             {
                 Log.Instance.Trace($"Passanger is trying to check reservation requests.");
                 var passangerId = Convert.ToInt32(User.Identity.Name);
-                ReservationStatusCheck check = _mediator.Send(new CheckRequestStatusQuery() { PassangerId = passangerId }).Result;
+                var check = _mediator.Send(new CheckRequestStatusQuery() { PassangerId = passangerId }).Result;
 
                 if (check == null)
                 {
@@ -136,7 +133,7 @@ namespace UberAPI.Controllers
             try
             {
                 var passangerId = Convert.ToInt32(User.Identity.Name);
-                List<Reservation> reservations = _mediator.Send(new ReservationHistoryQuery() { PassangerId = passangerId }).Result;
+                var reservations = _mediator.Send(new ReservationHistoryQuery() { PassangerId = passangerId }).Result;
 
                 return Ok(reservations);
             }

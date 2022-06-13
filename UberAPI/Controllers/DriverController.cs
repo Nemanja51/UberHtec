@@ -4,14 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UberAPI.CQRS.Driver.Commands;
-using UberAPI.CQRS.Driver.Queries;
+using Uber.Boundary.CQRS.Driver.Commands;
+using Uber.Boundary.CQRS.Driver.Queries;
+using Uber.Boundary.Helpers;
 using UberAPI.Helpers;
 using UberAPI.Helpers.Constants;
-using UberAPI.Helpers.Enums;
-using UberAPI.Models;
-using UberAPI.Models.Driver;
-using UberAPI.Repository.IRepository;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 

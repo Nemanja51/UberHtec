@@ -14,7 +14,7 @@ using Uber.Domain.Helpers.Constants;
 using Uber.Domain.Models;
 
 
-namespace Uber.Boundary.Repository
+namespace Uber.Persistence.Repository
 {
     public class UserRepository : IUserRepository
     {
