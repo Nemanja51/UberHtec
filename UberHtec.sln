@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Uber.Boundary", "Uber.Repos
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Uber.Bussines", "Uber.Bussines\Uber.Bussines.csproj", "{FF88EDEF-8B0D-42C8-A413-574310D2EA6E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Uber.Persistance", "Uber.Persistance\Uber.Persistance.csproj", "{C50F97FE-D065-4764-A6CC-BE2C8FE79B2D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Uber.Persistance", "Uber.Persistance\Uber.Persistance.csproj", "{C50F97FE-D065-4764-A6CC-BE2C8FE79B2D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

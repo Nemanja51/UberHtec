@@ -1,28 +1,11 @@
 ﻿using MediatR;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using UberAPI.Models;
-using UberAPI.Repository.IRepository;
+using Uber.Boundary.CQRS.Passanger;
 
-namespace UberAPI.CQRS.Driver.Queries
+namespace Uber.Boundary.CQRS.Driver.Queries
 {
-    public class GetAllPendingReservationsQuery : IRequest<List<Reservation>>
+    public class GetAllPendingReservationsQuery : IRequest<List<ReservationResponse>>
     {
         public int DriversId { get; set; }
-
-        public class GetAllPendingReservationsQueryHandler : IRequestHandler<GetAllPendingReservationsQuery, List<Reservation>>
-        {
-            private readonly IDriversRepository _driverRepo;
-            public GetAllPendingReservationsQueryHandler(IDriversRepository driverRepo)
-            {
-                _driverRepo = driverRepo;
-            }
-
-            public async Task<List<Reservation>> Handle(GetAllPendingReservationsQuery query, CancellationToken cancellationToken)
-            {
-                return await _driverRepo.GetAllPendingReservations(query.DriversId);
-            }
-        }
     }
 }

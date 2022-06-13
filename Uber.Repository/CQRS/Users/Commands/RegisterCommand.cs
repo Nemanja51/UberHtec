@@ -1,7 +1,4 @@
 ﻿using MediatR;
-using System.Threading;
-using System.Threading.Tasks;
-using Uber.Domain.Models;
 
 namespace Uber.Boundary.CQRS.Users.Commands
 {

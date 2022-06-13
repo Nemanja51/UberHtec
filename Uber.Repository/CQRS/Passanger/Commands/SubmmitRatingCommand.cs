@@ -1,6 +1,5 @@
 ﻿using MediatR;
-using System.Threading;
-using System.Threading.Tasks;
+using Uber.Boundary.Helpers;
 
 namespace Uber.Boundary.CQRS.Passanger.Commands
 {

@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Uber.Boundary.CQRS.Passanger.Commands;
 using Uber.Domain.IRepository;
+using Uber.Domain.Models;
 
 namespace Uber.Bussines.CQRS.Passanger.Commands
 {
@@ -16,7 +17,17 @@ namespace Uber.Bussines.CQRS.Passanger.Commands
 
         public async Task<string> Handle(SubmmitRatingCommand query, CancellationToken cancellationToken)
         {
-            return await _passangerRepo.SubmmitRaiting(query.RateDriver);
+            RateDriver rate = new RateDriver() 
+            {
+                Id = query.RateDriver.Id,
+                DriverId = query.RateDriver.DriverId,
+                PassangerId = query.RateDriver.PassangerId,
+                Rate = query.RateDriver.Rate,
+                Comment = query.RateDriver.Comment,
+                DateTimeOfRate = query.RateDriver.DateTimeOfRate
+            };
+
+            return await _passangerRepo.SubmmitRaiting(rate);
         }
     }
 }
