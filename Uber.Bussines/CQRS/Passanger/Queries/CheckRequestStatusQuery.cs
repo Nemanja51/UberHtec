@@ -1,27 +1,29 @@
 ﻿using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
-using UberAPI.Models;
-using UberAPI.Repository.IRepository;
+using Uber.Boundary.CQRS.Passanger.Queries;
+using Uber.Boundary.CQRS.Passanger;
+using Uber.Domain.IRepository;
 
-namespace UberAPI.CQRS.Passanger.Queries
+namespace Uber.Bussines.CQRS.Passanger.Queries
 {
-    public class CheckRequestStatusQuery : IRequest<ReservationStatusCheck>
+    public class CheckRequestStatusQueryHandler : IRequestHandler<CheckRequestStatusQuery, ReservationStatusCheckResponse>
     {
-        public int PassangerId { get; set; }
-
-        public class CheckRequestStatusQueryHandler : IRequestHandler<CheckRequestStatusQuery, ReservationStatusCheck>
+        private readonly IPassangerRepository _passangerRepo;
+        public CheckRequestStatusQueryHandler(IPassangerRepository passangerRepo)
         {
-            private readonly IPassangerRepository _passangerRepo;
-            public CheckRequestStatusQueryHandler(IPassangerRepository passangerRepo)
-            {
-                _passangerRepo = passangerRepo;
-            }
+            _passangerRepo = passangerRepo;
+        }
 
-            public async Task<ReservationStatusCheck> Handle(CheckRequestStatusQuery query, CancellationToken cancellationToken)
+        public async Task<ReservationStatusCheckResponse> Handle(CheckRequestStatusQuery query, CancellationToken cancellationToken)
+        {
+            var result = await _passangerRepo.CheckRequestStatus(query.PassangerId);
+            return new ReservationStatusCheckResponse()
             {
-                return await _passangerRepo.CheckRequestStatus(query.PassangerId);
-            }
+                ReservationStatus = (Boundary.Helpers.ReservationStatusEnum)result.ReservationStatus,
+                ReservationTimePassed = result.ReservationTimePassed
+            };
         }
     }
+
 }

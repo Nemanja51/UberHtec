@@ -10,11 +10,9 @@ namespace Uber.Bussines.CQRS.Users.Queries
     public class AuthenticateQueryHandler : IRequestHandler<AuthenticateQuery, UserResponse>
     {
         private readonly IUserRepository _userRepository;
-        private readonly IMapper _mapper;
 
-        public AuthenticateQueryHandler(IUserRepository userRepository, IMapper mapper)
+        public AuthenticateQueryHandler(IUserRepository userRepository)
         {
-            _mapper = mapper;
             _userRepository = userRepository;
         }
 

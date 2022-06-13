@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Uber.Domain\Uber.Domain.csproj" />
     <ProjectReference Include="..\Uber.Repository\Uber.Boundary.csproj" />
   </ItemGroup>
 
